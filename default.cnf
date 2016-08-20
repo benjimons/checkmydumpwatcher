@@ -1,0 +1,4 @@
+[Global]
+dir = /opt/OSINT/checkmydump
+apikey = 
+fromaddr = CheckMyDump <cmd@localhost>
