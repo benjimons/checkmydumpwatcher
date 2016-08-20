@@ -49,7 +49,7 @@ try:
 		#if we didnt find this entry in the database, enter it and build a string for the email notification
 		if len(c.fetchall()) == 0:
 			c.execute("INSERT into creds (username, password, userbase, dump_date) VALUES (?,?,?,?)", (row['username'], row['password'], row['userbase'], row['dump_date']))
-		        #conn.commit()
+		        conn.commit()
 			newstring = "DUMP DATE:"+row['dump_date']+", USERBASE: "+row['userbase']+", USER: "+row['username']+", PASSWORD: "+row['password']+"\r\n"
 			msgstring += newstring
 			newcounter+=1
