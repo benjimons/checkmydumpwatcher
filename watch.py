@@ -43,31 +43,31 @@ data = json.loads(response.read())
 try:
 	for row in data['rows']:
 		#try to find if we have seen this entry before
-		c.execute("SELECT * FROM creds where username=? and password=? and userbase=? and dump_date=?", (row['username'], row['password'], row['userbase'], row['dump_date']))
-		conn.commit()
-		counter+=1
-		#if we didnt find this entry in the database, enter it and build a string for the email notification
-		if len(c.fetchall()) == 0:
-			c.execute("INSERT into creds (username, password, userbase, dump_date) VALUES (?,?,?,?)", (row['username'], row['password'], row['userbase'], row['dump_date']))
-		        conn.commit()
-			newstring = "DUMP DATE:"+row['dump_date']+", USERBASE: "+row['userbase']+", USER: "+row['username']+", PASSWORD: "+row['password']+"\r\n"
-			msgstring += newstring
-			newcounter+=1
-except KeyError:
-	#none found
-	error=1
+		try:
+			c.execute("SELECT * FROM creds where username=? and password=? and userbase=? and dump_date=?", (row['username'], row['password'], row['source'], row['date']))
+			conn.commit()
+			counter+=1
+			#if we didnt find this entry in the database, enter it and build a string for the email notification
+			if len(c.fetchall()) == 0:
+				c.execute("INSERT into creds (username, password, userbase, dump_date) VALUES (?,?,?,?)", (row['username'], row['password'], row['source'], row['date']))
+			        conn.commit()
+				newstring = "DUMP DATE:"+row['date']+", USERBASE: "+row['source']+", USER: "+row['username']+", PASSWORD: "+row['password']+"\r\n"
+				msgstring += newstring
+				newcounter+=1
+		except: 
+			continue
 except:
-	logfile.write("Unexpected error:", sys.exec_info()[0])
-	print("Unexpected error:", sys.exec_info()[0])
-
+	error=1
 #email the new results
 if newcounter > 0:
-	msg = MIMEText(msgstring)
+	msg = MIMEText("Check OSINT machine /checkmydump/logs for raw output \r\n"+msgstring)
 	msg["From"] = fromaddr
 	msg["To"] = mailto
 	msg["Subject"] = "CMD New Credentials for "+domain
 	p = Popen(["/usr/sbin/sendmail", "-t", "-oi"], stdin=PIPE)
 	p.communicate(msg.as_string())	
+	with open(dir+"/logs/cmd-"+domain+".log", "a+") as logfile:
+		logfile.write(msg.as_string())
 	
 with open(dir+"/logs/cmd-"+domain+".log", "a+") as logfile:
 	logfile.write(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))+" CheckMyDump - "+str(counter)+" entries found for "+domain+", "+str(newcounter)+" new\n\r")
