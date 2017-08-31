@@ -18,6 +18,13 @@ fromaddr = config.get('Global', 'fromaddr')
 domain = sys.argv[2]
 mailto = sys.argv[3]
 
+#Create directories if they dont exist
+if not os.path.exists(dir+'/dbs'):
+    os.makedirs(dir+'/dbs')
+
+if not os.path.exists(dir+'/logs'):
+    os.makedirs(dir+'/logs')
+
 #connect to DB - create one if it does not exist
 conn = sqlite3.connect(dir+'/dbs/cmddb-'+domain+'.db')
 c = conn.cursor()
