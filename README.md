@@ -1,5 +1,5 @@
 # checkmydumpwatcher
 Usage: watcher.py <conffile> <domain> <sendtoemailaddress>
 
-##Example: 
+## Example: 
 watcher.py default.cnf example.com email@example.com
